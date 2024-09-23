@@ -1,6 +1,6 @@
 protectSpawn: true
 boostEnabled: true
-fallDamage: true
+fallDamage: false
 spawnRadius: 30
 boostMessage: "Drücke %key% zum boosten"
 world: "world"

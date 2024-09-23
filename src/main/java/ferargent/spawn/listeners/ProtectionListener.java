@@ -4,7 +4,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -43,11 +46,27 @@ public class ProtectionListener extends BukkitRunnable implements Listener {
             if (isInSpawnRadius(player) && protectSpawn && player.getGameMode() == GameMode.SURVIVAL) {
                 player.setGameMode(GameMode.ADVENTURE);
                 protectedPlayers.add(player);
-            } else if (!isInSpawnRadius(player) && protectedPlayers.contains(player)) {
+            } else if (!protectedPlayers.contains(player) && player.getGameMode() == GameMode.ADVENTURE && isInSpawnRadius(player)) {
+                protectedPlayers.add(player);
+            } else if (!isInSpawnRadius(player) && protectedPlayers.contains(player) && player.getGameMode() == GameMode.ADVENTURE) {
                 player.setGameMode(GameMode.SURVIVAL);
                 protectedPlayers.remove(player);
             }
         });
+    }
+
+    @EventHandler
+    public void onPlayerDamage(EntityDamageEvent event) {
+        if (event.getEntity() instanceof Player player && isInSpawnRadius(player) && protectSpawn) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onInteraction(PlayerInteractEvent event) {
+        if (isInSpawnRadius(event.getPlayer()) && protectSpawn && event.getPlayer().getGameMode() == GameMode.ADVENTURE) {
+            event.setCancelled(true);
+        }
     }
 
     private boolean isInSpawnRadius(Player player) {

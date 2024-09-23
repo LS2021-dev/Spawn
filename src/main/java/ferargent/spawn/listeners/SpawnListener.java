@@ -5,7 +5,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.World;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -58,7 +57,7 @@ public class SpawnListener extends BukkitRunnable implements Listener {
             if (player.getGameMode() != GameMode.SURVIVAL && player.getGameMode() != GameMode.ADVENTURE) return;
             player.setAllowFlight(isInSpawnRadius(player));
 
-            if (flying.contains(player) && !player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType().isAir()) {
+            if (flying.contains(player) && player.isOnGround()) {
                 player.setAllowFlight(false);
                 player.setGliding(false);
                 boosted.remove(player);
@@ -94,7 +93,7 @@ public class SpawnListener extends BukkitRunnable implements Listener {
     void onDamage(EntityDamageEvent event) {
         if (event.getEntityType() != EntityType.PLAYER) return;
         if (fallDamage && !isInSpawnRadius((Player) event.getEntity())) return;
-        if (event.getEntityType() == EntityType.PLAYER && (event.getCause() == EntityDamageEvent.DamageCause.FALL || event.getCause() == EntityDamageEvent.DamageCause.FLY_INTO_WALL) && flying.contains((Player) event.getEntity())) {
+        if (event.getEntityType() == EntityType.PLAYER && (event.getCause() == EntityDamageEvent.DamageCause.FALL || event.getCause() == EntityDamageEvent.DamageCause.FLY_INTO_WALL) && (flying.contains((Player) event.getEntity()) || isInSpawnRadius((Player) event.getEntity()))) {
             event.setCancelled(true);
         }
     }
