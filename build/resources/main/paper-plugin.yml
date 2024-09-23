@@ -1,0 +1,4 @@
+name: Spawn
+version: '1.0-SNAPSHOT'
+main: ferargent.spawn.Spawn
+api-version: '1.21'
