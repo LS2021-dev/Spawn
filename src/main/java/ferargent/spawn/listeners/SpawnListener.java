@@ -25,16 +25,18 @@ public class SpawnListener extends BukkitRunnable implements Listener {
     private final boolean boostEnabled;
     private final boolean fallDamage;
     private final int spawnRadius;
+    private final int boostStrength;
     private final String boostMessage;
     private final World world;
 
     private final List<Player> flying = new ArrayList<>();
     private final List<Player> boosted = new ArrayList<>();
 
-    private SpawnListener(Plugin plugin, boolean boostEnabled, boolean fallDamage, int spawnRadius, String boostMessage, @Nullable World world) {
+    private SpawnListener(Plugin plugin, boolean boostEnabled, boolean fallDamage, int spawnRadius, int boostStrength, String boostMessage, @Nullable World world) {
         this.boostEnabled = boostEnabled;
         this.fallDamage = fallDamage;
         this.spawnRadius = spawnRadius;
+        this.boostStrength = boostStrength;
         this.boostMessage = boostMessage;
         this.world = world;
 
@@ -44,11 +46,11 @@ public class SpawnListener extends BukkitRunnable implements Listener {
 
     public static SpawnListener create(Plugin plugin) {
         var config = plugin.getConfig();
-        if (!config.contains("boostEnabled") || !config.contains("fallDamage") || !config.contains("spawnRadius") || !config.contains("world") || !config.contains("boostMessage")) {
+        if (!config.contains("boostEnabled") || !config.contains("fallDamage") || !config.contains("spawnRadius") || !config.contains("boostStrength") || !config.contains("world") || !config.contains("boostMessage")) {
             plugin.saveResource("config.yml", true);
             plugin.reloadConfig();
         }
-        return new SpawnListener(plugin, config.getBoolean("boostEnabled"), config.getBoolean("fallDamage"), config.getInt("spawnRadius"), config.getString("boostMessage"), Bukkit.getWorld(Objects.requireNonNull(config.getString("world"))));
+        return new SpawnListener(plugin, config.getBoolean("boostEnabled"), config.getBoolean("fallDamage"), config.getInt("spawnRadius"), config.getInt("boostStrength"), config.getString("boostMessage"), Bukkit.getWorld(Objects.requireNonNull(config.getString("world"))));
     }
 
     @Override
@@ -103,7 +105,7 @@ public class SpawnListener extends BukkitRunnable implements Listener {
         if (!boostEnabled || !flying.contains(event.getPlayer()) || boosted.contains(event.getPlayer())) return;
         event.setCancelled(true);
         boosted.add(event.getPlayer());
-        event.getPlayer().setVelocity(event.getPlayer().getLocation().getDirection().multiply(5));
+        event.getPlayer().setVelocity(event.getPlayer().getLocation().getDirection().multiply(boostStrength));
     }
 
     private boolean isInSpawnRadius(Player player) {
