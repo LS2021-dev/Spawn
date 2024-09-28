@@ -70,6 +70,7 @@ public class ProtectionListener extends BukkitRunnable implements Listener {
     }
 
     private boolean isInSpawnRadius(Player player) {
+        if (player.getWorld() != world) return false;
         return player.getLocation().distance(world.getSpawnLocation()) <= spawnRadius;
     }
 }
